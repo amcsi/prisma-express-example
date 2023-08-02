@@ -50,6 +50,18 @@ app.get('/api/users', async (req, res) => {
   });
 });
 
+app.get('/api/users/:id', async (req, res) => {
+  const user = await prisma.user.findFirstOrThrow({
+    where: {
+      id: Number(req.params.id),
+    }
+  })
+
+  res.json({
+    data: user,
+  });
+});
+
 // Set up the server to listen on port 3000
 const PORT = 3000;
 app.listen(PORT, () => {
