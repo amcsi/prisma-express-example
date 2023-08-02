@@ -22,13 +22,32 @@ app.post('/api/users', async (req, res) => {
     },
   })
 
-  res.json(user);
+  res.json({
+    data: user,
+  });
 });
 
 app.get('/api/users', async (req, res) => {
-  const users = await prisma.user.findMany()
+  const limit = Number(req.query.limit) ?? 10;
+  const page = Number(req.query.page) ?? 1;
+  const offset = (page - 1) * limit;
 
-  res.json(users);
+  const total = await prisma.user.count();
+
+  const users = await prisma.user.findMany({
+    skip: offset,
+    take: limit,
+  })
+
+  res.json({
+    data: users,
+    pagination: {
+      total,
+      total_pages: Math.ceil(total / limit),
+      current_page: page,
+      limit,
+    }
+  });
 });
 
 // Set up the server to listen on port 3000
